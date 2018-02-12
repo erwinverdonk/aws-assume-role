@@ -61,27 +61,25 @@ exports.assumeRole = params => {
     .listMFADevices()
     .promise()
     .then(_ => _.MFADevices || [])
-    .then(
-      devices =>
-        new Promise((resolve, reject) => {
-          if (devices.length === 0) {
-            resolve({ code: undefined, devices: [] });
-            return;
-          }
+    .then(devices =>
+      new Promise((resolve, reject) => {
+        if (devices.length === 0) {
+          resolve({ code: undefined, devices: [] });
+          return;
+        }
 
-          requestMFACode()
-            .then(code => {
-              resolve({
-                code,
-                devices
-              });
-            })
-            .catch(_ => reject(_));
-        })
+        requestMFACode()
+          .then(code => {
+            resolve({
+              code,
+              devices
+            });
+          })
+          .catch(_ => reject(_));
+      })
     )
     .then(mfa => {
       const sts = new AWS.STS();
-
       const tryToAssume = device => {
         return sts
           .assumeRole({
@@ -114,10 +112,7 @@ exports.assumeRole = params => {
       AWS.config = new AWS.Config();
 
       storage.setItemSync("AWS_ACCESS_KEY_ID", _.credentials.AccessKeyId);
-      storage.setItemSync(
-        "AWS_SECRET_ACCESS_KEY",
-        _.credentials.SecretAccessKey
-      );
+      storage.setItemSync("AWS_SECRET_ACCESS_KEY", _.credentials.SecretAccessKey);
       storage.setItemSync("AWS_SESSION_TOKEN", _.credentials.SessionToken);
 
       return _;
