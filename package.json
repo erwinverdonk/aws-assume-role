@@ -1,0 +1,15 @@
+{
+  "name": "aws-assume-role",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Erwin Verdonk <e.verdonk@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.192.0",
+    "node-persist": "^2.1.0"
+  }
+}
