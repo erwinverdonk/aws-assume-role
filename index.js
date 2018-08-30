@@ -42,7 +42,8 @@ const requestMFA = () => {
 };
 
 const getStoredCredentials = (roleArn) => {
-  const credentials = JSON.parse(storage.getItemSync(roleArn));
+  const credentialsString = storage.getItemSync(roleArn);
+	const credentials = credentialsString ? JSON.parse(credentialsString) : {};
   const { accessKeyId, secretAccessKey, sessionToken } = credentials;
 
   return Promise.resolve(
