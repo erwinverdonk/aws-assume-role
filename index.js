@@ -41,10 +41,9 @@ const requestMFA = () => {
   );
 };
 
-const getStoredCredentials = () => {
-  const accessKeyId = storage.getItemSync('AWS_ACCESS_KEY_ID');
-  const secretAccessKey = storage.getItemSync('AWS_SECRET_ACCESS_KEY');
-  const sessionToken = storage.getItemSync('AWS_SESSION_TOKEN');
+const getStoredCredentials = (roleArn) => {
+  const credentials = JSON.parse(storage.getItemSync(roleArn));
+  const { accessKeyId, secretAccessKey, sessionToken } = credentials;
 
   return Promise.resolve(
     accessKeyId && secretAccessKey && sessionToken
@@ -53,11 +52,8 @@ const getStoredCredentials = () => {
   );
 };
 
-const setStoredCredentials = credentials => {
-  storage.setItemSync('AWS_ACCESS_KEY_ID', credentials.accessKeyId);
-  storage.setItemSync('AWS_SECRET_ACCESS_KEY', credentials.secretAccessKey);
-  storage.setItemSync('AWS_SESSION_TOKEN', credentials.sessionToken);
-
+const setStoredCredentials = (roleArn, credentials) => {
+  storage.setItemSync(roleArn, JSON.stringify(credentials))
   return Promise.resolve(credentials);
 };
 
@@ -93,7 +89,7 @@ const requestTemporaryCredentials = (roleArn, durationSeconds) => requestMFA()
     }
   }))
   .then(_ => {
-    return setStoredCredentials(_.credentials);
+    return setStoredCredentials(roleArn, _.credentials);
   });
 
 exports.assumeRole = params => {
@@ -111,6 +107,6 @@ exports.assumeRole = params => {
 
   storage.initSync({ ttl: durationSeconds * 1000 });
 
-  return getStoredCredentials()
+  return getStoredCredentials(roleArn)
     .then(_ => !_ ? requestTemporaryCredentials(roleArn, durationSeconds) : _);
 };
